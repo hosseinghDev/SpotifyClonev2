@@ -7,6 +7,7 @@ using SpotifyClone.Api.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("https://*:7225", "http://*:5141");
 var configuration = builder.Configuration;
 
 // Add services to the container.
