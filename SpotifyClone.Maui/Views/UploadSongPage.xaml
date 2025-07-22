@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpotifyClone.Maui.Views.UploadSongPage"
+             xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
+             x:DataType="viewmodel:UploadSongViewModel"
+             Title="{Binding Title}" BackgroundColor="#121212">
+    <ContentPage.Resources>
+        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#535353"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="HeightRequest" Value="45"/>
+        </Style>
+        <Style TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="#2a2a2a"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderColor" Value="Transparent"/>
+        </Style>
+    </ContentPage.Resources>
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="20">
+            <Label Text="Upload a New Song" FontSize="24" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+            <Frame>
+                <Entry Placeholder="Song Title" Text="{Binding TitleText}" TextColor="White" PlaceholderColor="Gray" Margin="10,0"/>
+            </Frame>
+            <Frame>
+                <Entry Placeholder="Artist Name" Text="{Binding SingerName}" TextColor="White" PlaceholderColor="Gray" Margin="10,0"/>
+            </Frame>
+            <Frame>
+                <Entry Placeholder="Genre" Text="{Binding Genre}" TextColor="White" PlaceholderColor="Gray" Margin="10,0"/>
+            </Frame>
+            <Button Text="Select Audio File (.mp3)" Command="{Binding SelectAudioFileCommand}"/>
+            <Label Text="{Binding AudioFileName, StringFormat='Selected: {0}'}" TextColor="Gray" IsVisible="{Binding AudioFileName, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
+            <Button Text="Select Cover Image" Command="{Binding SelectImageFileCommand}"/>
+            <Label Text="{Binding ImageFileName, StringFormat='Selected: {0}'}" TextColor="Gray" IsVisible="{Binding ImageFileName, Converter={StaticResource IsNotNullOrEmptyConverter}}"/>
+            <Button Text="Upload" Command="{Binding UploadSongCommand}" BackgroundColor="#1DB954" TextColor="Black" FontAttributes="Bold" HeightRequest="50" Margin="0,20,0,0"/>
+            <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#1DB954"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

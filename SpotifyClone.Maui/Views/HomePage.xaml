@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpotifyClone.Maui.Views.HomePage"
+             xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
+             xmlns:model="clr-namespace:SpotifyClone.Maui.Models"
+             x:DataType="viewmodel:HomeViewModel"
+             Title="{Binding Title}" BackgroundColor="#121212">
+    <Grid RowDefinitions="Auto, *">
+        <SearchBar Grid.Row="0" Placeholder="Search songs, artists, genres..." Text="{Binding SearchText}"
+                   SearchCommand="{Binding LoadSongsCommand}" BackgroundColor="#2a2a2a" PlaceholderColor="Gray" TextColor="White" Margin="10"/>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Songs}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Song">
+                    <Grid Padding="10" ColumnDefinitions="Auto, *, Auto, Auto" RowSpacing="5">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=PlaySongCommand}" CommandParameter="{Binding .}"/>
+                        </Grid.GestureRecognizers>
+
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 5" StrokeThickness="0" WidthRequest="60" HeightRequest="60">
+                            <Image Aspect="AspectFill" Source="{Binding ImageUrl, TargetNullValue='dotnet_bot.png'}" WidthRequest="60" HeightRequest="60"/>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Padding="10,0" VerticalOptions="Center">
+                            <Label Text="{Binding Title}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                            <Label Text="{Binding SingerName}" TextColor="Gray" FontSize="14">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToSingerProfileCommand}" CommandParameter="{Binding SingerId}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </VerticalStackLayout>
+
+                        <ImageButton Grid.Column="2" Source="comments.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
+                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
+
+                        <ImageButton Grid.Column="3" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <StackLayout Padding="20">
+                    <Label Text="No songs found." TextColor="Gray" HorizontalOptions="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+        <ActivityIndicator Grid.Row="1" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#1DB954" VerticalOptions="Center" HorizontalOptions="Center"/>
+    </Grid>
+</ContentPage>

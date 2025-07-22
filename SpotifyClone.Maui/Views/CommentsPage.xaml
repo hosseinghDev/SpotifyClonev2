@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpotifyClone.Maui.Views.CommentsPage"
+             xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
+             xmlns:model="clr-namespace:SpotifyClone.Maui.Models"
+             x:DataType="viewmodel:CommentsViewModel"
+             Title="{Binding Title}" BackgroundColor="#121212">
+    <Grid RowDefinitions="*, Auto">
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Comments}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Comment">
+                    <Frame Margin="10,5" Padding="10" CornerRadius="8" BackgroundColor="#2a2a2a" BorderColor="Transparent">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Text}" TextColor="White" FontSize="16"/>
+                            <Label Text="{Binding Username, StringFormat='- {0}'}" TextColor="Gray" FontSize="12" HorizontalOptions="End"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Padding="10">
+            <Entry Grid.Column="0" Placeholder="Add a comment..." Text="{Binding NewCommentText}" TextColor="White" PlaceholderColor="Gray"/>
+            <Button Grid.Column="1" Text="Post" Command="{Binding AddCommentCommand}" BackgroundColor="#1DB954" TextColor="Black"/>
+        </Grid>
+    </Grid>
+</ContentPage>

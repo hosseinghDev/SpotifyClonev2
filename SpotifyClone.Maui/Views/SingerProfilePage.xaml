@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpotifyClone.Maui.Views.SingerProfilePage"
+             xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
+             xmlns:model="clr-namespace:SpotifyClone.Maui.Models"
+             x:DataType="viewmodel:SingerProfileViewModel"
+             Title="{Binding Title}" BackgroundColor="#121212">
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="15">
+            <Label Text="{Binding Singer.Name}" FontSize="32" FontAttributes="Bold" TextColor="White"/>
+            <Label Text="{Binding Singer.Bio}" FontSize="16" TextColor="Gray"/>
+            <Button Text="View Artist Comments" Command="{Binding GoToSingerCommentsCommand}" CommandParameter="{Binding Singer.Id}" BackgroundColor="#2a2a2a" TextColor="White" Margin="0,10"/>
+
+            <Label Text="Songs" FontSize="22" FontAttributes="Bold" TextColor="White" Margin="0,20,0,5"/>
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="model:Song">
+                    <Grid Padding="10,5" ColumnDefinitions="Auto, *, Auto">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:SingerProfileViewModel}}, Path=PlaySongCommand}" CommandParameter="{Binding .}"/>
+                        </Grid.GestureRecognizers>
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 5" StrokeThickness="0" WidthRequest="50" HeightRequest="50">
+                            <Image Aspect="AspectFill" Source="{Binding ImageUrl, TargetNullValue='dotnet_bot.png'}" WidthRequest="50" HeightRequest="50"/>
+                        </Border>
+                        <Label Grid.Column="1" Text="{Binding Title}" TextColor="White" FontSize="16" VerticalOptions="Center" Padding="10,0"/>
+                        <ImageButton Grid.Column="2" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
+                    </Grid>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+            <BindableLayout.ItemsSource>
+                <Binding Path="Singer.Songs"/>
+            </BindableLayout.ItemsSource>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

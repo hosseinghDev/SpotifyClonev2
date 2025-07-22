@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpotifyClone.Maui.Views.RegisterPage"
+             xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
+             x:DataType="viewmodel:RegisterViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#121212">
+    <VerticalStackLayout Spacing="25" Padding="30,0" VerticalOptions="Center">
+        <Label Text="Create Account" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White"/>
+
+        <Frame BackgroundColor="#2a2a2a" CornerRadius="10" Padding="0" BorderColor="Transparent">
+            <Entry Placeholder="Username" Text="{Binding Username}" TextColor="White" PlaceholderColor="Gray" HeightRequest="50" Margin="10,0"/>
+        </Frame>
+
+        <Frame BackgroundColor="#2a2a2a" CornerRadius="10" Padding="0" BorderColor="Transparent">
+            <Entry Placeholder="Password" Text="{Binding Password}" IsPassword="True" TextColor="White" PlaceholderColor="Gray" HeightRequest="50" Margin="10,0"/>
+        </Frame>
+
+        <Button Text="Sign Up" Command="{Binding RegisterCommand}" BackgroundColor="#1DB954" TextColor="Black" FontAttributes="Bold" HeightRequest="50" CornerRadius="25"/>
+
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#1DB954"/>
+
+        <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
+            <Label Text="Already have an account?" TextColor="Gray"/>
+            <Label Text="Log in." TextColor="#1DB954" FontAttributes="Bold">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLoginTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

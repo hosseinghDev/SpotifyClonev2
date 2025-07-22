@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpotifyClone.Maui.Views.PlaylistDetailPage"
+             xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
+             xmlns:model="clr-namespace:SpotifyClone.Maui.Models"
+             x:DataType="viewmodel:PlaylistDetailViewModel"
+             Title="{Binding Title}" BackgroundColor="#121212">
+    <Grid RowDefinitions="Auto, *">
+        <Label Grid.Row="0" Text="{Binding Playlist.Name}" TextColor="White" FontSize="28" FontAttributes="Bold" Margin="20"/>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Songs}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Song">
+                    <Grid Padding="10" ColumnDefinitions="Auto, *, Auto, Auto" RowSpacing="5">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlaylistDetailViewModel}}, Path=PlaySongCommand}" CommandParameter="{Binding .}"/>
+                        </Grid.GestureRecognizers>
+
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 5" StrokeThickness="0" WidthRequest="60" HeightRequest="60">
+                            <Image Aspect="AspectFill" Source="{Binding ImageUrl, TargetNullValue='dotnet_bot.png'}" WidthRequest="60" HeightRequest="60"/>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Padding="10,0" VerticalOptions="Center">
+                            <Label Text="{Binding Title}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                            <Label Text="{Binding SingerName}" TextColor="Gray" FontSize="14"/>
+                        </VerticalStackLayout>
+
+                        <ImageButton Grid.Column="2" Source="remove_circle.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
+                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlaylistDetailViewModel}}, Path=RemoveSongCommand}" CommandParameter="{Binding .}"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <StackLayout Padding="20">
+                    <Label Text="This playlist is empty." TextColor="Gray" HorizontalOptions="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+</ContentPage>

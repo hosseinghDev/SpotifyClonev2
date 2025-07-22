@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="SpotifyClone.Maui.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:SpotifyClone.Maui.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarBackgroundColor="#2a2a2a"
+    Shell.TabBarTitleColor="#1DB954"
+    Shell.TabBarUnselectedColor="Gray">
+
+    <TabBar>
+        <ShellContent Title="Home" Icon="home.png" ContentTemplate="{DataTemplate views:HomePage}" Route="HomePage" />
+        <ShellContent Title="Playlists" Icon="library.png" ContentTemplate="{DataTemplate views:PlaylistPage}" Route="PlaylistPage" />
+        <ShellContent Title="Upload" Icon="upload.png" ContentTemplate="{DataTemplate views:UploadSongPage}" Route="UploadSongPage" />
+    </TabBar>
+
+</Shell>
