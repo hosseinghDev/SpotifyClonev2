@@ -19,43 +19,56 @@ namespace SpotifyClone.Api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly ILogger<SongsController> _logger; // <-- ADD LOGGER
 
-        public SongsController(ApplicationDbContext context, IWebHostEnvironment hostingEnvironment)
+        public SongsController(ApplicationDbContext context, IWebHostEnvironment hostingEnvironment, ILogger<SongsController> logger) // <-- INJECT LOGGER
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
+            _logger = logger; // <-- INITIALIZE LOGGER
         }
 
         private string GetBaseUrl()
         {
-            return $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+            // Use the current request's scheme and host for dynamic URL generation
+            var request = HttpContext.Request;
+            return $"{request.Scheme}://{request.Host}";
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs([FromQuery] string search)
         {
+            // Start with a clean query
             var query = _context.Songs.Include(s => s.Singer).AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(s => s.Title.Contains(search) ||
-                                         s.Singer.Name.Contains(search) ||
-                                         s.Genre.Contains(search));
+                // Apply search filter if provided
+                var searchTerm = search.ToLower();
+                query = query.Where(s => s.Title.ToLower().Contains(searchTerm) ||
+                                         s.Singer.Name.ToLower().Contains(searchTerm) ||
+                                         s.Genre.ToLower().Contains(searchTerm));
             }
 
-            var songs = await query.ToListAsync();
             var baseUrl = GetBaseUrl();
 
-            return songs.Select(s => new SongDto
-            {
-                Id = s.Id,
-                Title = s.Title,
-                SingerName = s.Singer.Name,
-                SingerId = s.SingerId,
-                Genre = s.Genre,
-                FileUrl = $"{baseUrl}/api/songs/stream/{s.Id}",
-                ImageUrl = string.IsNullOrEmpty(s.ImageUrl) ? null : $"{baseUrl}/{s.ImageUrl.Replace("\\", "/")}"
-            }).ToList();
+            // Project the results into DTOs
+            var songs = await query
+                .Select(s => new SongDto
+                {
+                    Id = s.Id,
+                    Title = s.Title,
+                    SingerName = s.Singer.Name,
+                    SingerId = s.SingerId,
+                    Genre = s.Genre,
+                    // The streaming URL points to our controller action
+                    FileUrl = $"{baseUrl}/api/songs/stream/{s.Id}",
+                    // The image URL points directly to the static file path
+                    ImageUrl = string.IsNullOrEmpty(s.ImageUrl) ? null : $"{baseUrl}/{s.ImageUrl}"
+                })
+                .ToListAsync();
+
+            return Ok(songs); // <-- ALWAYS WRAP IN OK() FOR CONSISTENCY
         }
 
         [HttpGet("stream/{id}")]
@@ -64,16 +77,22 @@ namespace SpotifyClone.Api.Controllers
             var song = await _context.Songs.FindAsync(id);
             if (song == null || string.IsNullOrEmpty(song.FilePath))
             {
-                return NotFound();
+                _logger.LogWarning($"StreamSong: Song with ID {id} or its FilePath not found in database.");
+                return NotFound("Song metadata not found.");
             }
 
             var filePath = Path.Combine(_hostingEnvironment.WebRootPath, song.FilePath);
+
+            _logger.LogInformation($"StreamSong: Attempting to stream file from path: {filePath}"); // <-- LOG THE PATH
+
             if (!System.IO.File.Exists(filePath))
             {
+                _logger.LogError($"StreamSong: File does not exist on server at path: {filePath}");
                 return NotFound("File not found on server.");
             }
 
             var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            // Return as audio/mpeg and enable range processing for seeking
             return File(stream, "audio/mpeg", enableRangeProcessing: true);
         }
 

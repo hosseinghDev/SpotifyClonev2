@@ -15,9 +15,7 @@ public partial class HomePage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        if (_viewModel.Songs.Count == 0)
-        {
-            _viewModel.LoadSongsCommand.Execute(null);
-        }
+        // Always execute the command on appearing to get the latest songs.
+        _viewModel.LoadSongsCommand.Execute(null);
     }
 }

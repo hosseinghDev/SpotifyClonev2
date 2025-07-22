@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-
-namespace SpotifyClone.Api.Models
+﻿namespace SpotifyClone.Api.Models
 {
     public class User
     {
         public int Id { get; set; }
-        public string Username { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
-
+        public string Username { get; set; } = string.Empty;
+        public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
+        public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
         public ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
