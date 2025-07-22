@@ -25,7 +25,6 @@ namespace SpotifyClone.Maui.Services
             _currentPlayer.Play();
         }
 
-        
         public void StopAudio()
         {
             if (_currentPlayer != null && _currentPlayer.IsPlaying)

@@ -4,7 +4,6 @@ using SpotifyClone.Maui.Models;
 using SpotifyClone.Maui.Services;
 using SpotifyClone.Maui.Views;
 using System.Collections.ObjectModel;
-using static Android.Provider.MediaStore.Audio;
 
 namespace SpotifyClone.Maui.ViewModels
 {
