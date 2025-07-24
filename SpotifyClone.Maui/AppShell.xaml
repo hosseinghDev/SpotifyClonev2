@@ -42,9 +42,11 @@
         </DataTemplate>
     </Shell.ItemTemplate>
 
+    <!-- In AppShell.xaml -->
     <TabBar>
         <ShellContent Title="Home" Icon="home.png" ContentTemplate="{DataTemplate views:HomePage}" Route="HomePage" />
-        <ShellContent Title="Playlists" Icon="library.png" ContentTemplate="{DataTemplate views:PlaylistPage}" Route="PlaylistPage" />
+        <!-- CHANGE THIS LINE -->
+        <ShellContent Title="Library" Icon="library.png" ContentTemplate="{DataTemplate views:LibraryPage}" Route="LibraryPage" />
         <ShellContent Title="Upload" Icon="upload.png" ContentTemplate="{DataTemplate views:UploadSongPage}" Route="UploadSongPage" />
     </TabBar>
 

@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using SpotifyClone.Maui.Models;
 using SpotifyClone.Maui.Services;
 using SpotifyClone.Maui.Views;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.Messaging;
+using SpotifyClone.Maui.Messages;
 
 namespace SpotifyClone.Maui.ViewModels
 {
@@ -11,6 +14,7 @@ namespace SpotifyClone.Maui.ViewModels
     {
         private readonly ApiService _apiService;
         private readonly GlobalAudioService _globalAudioService;
+        private readonly IMessenger _messenger;
 
         [ObservableProperty]
         ObservableCollection<Song> songs;
@@ -18,10 +22,11 @@ namespace SpotifyClone.Maui.ViewModels
         [ObservableProperty]
         string? searchText;
 
-        public HomeViewModel(ApiService apiService, GlobalAudioService globalAudioService)
+        public HomeViewModel(ApiService apiService, GlobalAudioService globalAudioService, IMessenger messenger)
         {
             _apiService = apiService;
             _globalAudioService = globalAudioService;
+            _messenger = messenger;
             Title = "Home";
             Songs = new ObservableCollection<Song>();
         }
@@ -69,6 +74,7 @@ namespace SpotifyClone.Maui.ViewModels
             if (result != null)
             {
                 song.IsLiked = result.IsLiked;
+                _messenger.Send(new LibraryContentChangedMessage());
             }
         }
 

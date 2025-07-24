@@ -5,6 +5,7 @@ using Plugin.Maui.Audio;
 using SpotifyClone.Maui.Services;
 using SpotifyClone.Maui.ViewModels;
 using SpotifyClone.Maui.Views;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace SpotifyClone.Maui;
 
@@ -26,6 +27,7 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         // Services
+        builder.Services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
         //builder.Services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
         builder.Services.AddSingleton<ApiService>();
         builder.Services.AddSingleton(AudioManager.Current);
@@ -45,6 +47,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CommentsViewModel>();
         builder.Services.AddTransient<SingerCommentsViewModel>();
         builder.Services.AddTransient<PlayerViewModel>();
+        builder.Services.AddTransient<LibraryViewModel>();
 
         // REMOVED PlayerViewModel registration
 
@@ -52,7 +55,8 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
         builder.Services.AddTransient<HomePage>();
-        builder.Services.AddTransient<PlaylistPage>();
+        builder.Services.AddTransient<LibraryPage>();
+        //builder.Services.AddTransient<PlaylistPage>();
         builder.Services.AddTransient<UploadSongPage>();
         builder.Services.AddTransient<PlaylistDetailPage>();
         builder.Services.AddTransient<SingerProfilePage>();
