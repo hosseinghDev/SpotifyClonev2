@@ -51,11 +51,13 @@ namespace SpotifyClone.Maui.ViewModels
         }
 
         // THIS COMMAND IS NOW DIFFERENT
+        // In HomeViewModel.cs
         [RelayCommand]
         async Task PlaySong(Song song)
         {
             if (song == null) return;
-            await _globalAudioService.PlaySong(song);
+            // Pass the selected song AND the entire current list to the service
+            await _globalAudioService.StartPlayback(song, Songs.ToList());
         }
 
         [RelayCommand]

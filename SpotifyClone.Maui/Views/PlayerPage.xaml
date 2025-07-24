@@ -21,8 +21,7 @@
         <Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10" VerticalOptions="Center">
             <Label Grid.Column="0" Text="{Binding PositionText}" TextColor="Gray" FontSize="12"/>
 
-            <Slider x:Name="PositionSlider"
-                    Grid.Column="1" 
+            <Slider Grid.Column="1" 
                     Maximum="{Binding Duration}" 
                     Value="{Binding CurrentPosition}"
                     ThumbColor="#1DB954" 
@@ -34,14 +33,11 @@
         </Grid>
 
         <HorizontalStackLayout Grid.Row="3" Spacing="40" HorizontalOptions="Center" Margin="0,10">
-            <ImageButton Source="shuffle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
-            <ImageButton Source="skip_previous.png" WidthRequest="40" HeightRequest="40" BackgroundColor="Transparent"/>
-            <ImageButton Source="{Binding PlayPauseButtonIcon}"
-                         Command="{Binding TogglePlayPauseCommand}"
-                         WidthRequest="70" HeightRequest="70" BackgroundColor="Transparent"/>
-            <ImageButton Source="skip_next.png" WidthRequest="40" HeightRequest="40" BackgroundColor="Transparent"/>
-            <ImageButton Source="repeat.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
+            <ImageButton Source="{Binding ShuffleIcon}" Command="{Binding ToggleShuffleCommand}" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
+            <ImageButton Source="skip_previous.png" Command="{Binding SkipPreviousCommand}" WidthRequest="40" HeightRequest="40" BackgroundColor="Transparent"/>
+            <ImageButton Source="{Binding PlayPauseButtonIcon}" Command="{Binding TogglePlayPauseCommand}" WidthRequest="70" HeightRequest="70" BackgroundColor="Transparent"/>
+            <ImageButton Source="skip_next.png" Command="{Binding SkipNextCommand}" WidthRequest="40" HeightRequest="40" BackgroundColor="Transparent"/>
+            <ImageButton Source="{Binding RepeatIcon}" Command="{Binding ToggleRepeatCommand}" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
         </HorizontalStackLayout>
     </Grid>
-
 </ContentPage>
