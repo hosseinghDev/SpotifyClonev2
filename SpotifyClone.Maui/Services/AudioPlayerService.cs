@@ -1,4 +1,5 @@
 ﻿using Plugin.Maui.Audio;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SpotifyClone.Maui.Services
@@ -6,14 +7,15 @@ namespace SpotifyClone.Maui.Services
     public class AudioPlayerService
     {
         private readonly IAudioManager _audioManager;
-        private IAudioPlayer _currentPlayer;
+        private IAudioPlayer? _currentPlayer;
 
         public AudioPlayerService(IAudioManager audioManager)
         {
             _audioManager = audioManager;
         }
 
-        public async Task PlayAudio(string url)
+        // Changed to accept a Stream instead of a URL
+        public async Task PlayAudio(Stream audioStream)
         {
             if (_currentPlayer != null)
             {
@@ -21,7 +23,12 @@ namespace SpotifyClone.Maui.Services
                 _currentPlayer.Dispose();
             }
 
-            _currentPlayer = _audioManager.CreatePlayer(url);
+            if (audioStream == null || audioStream.Length == 0)
+            {
+                return; // Do nothing if the stream is invalid
+            }
+
+            _currentPlayer = _audioManager.CreatePlayer(audioStream);
             _currentPlayer.Play();
         }
 
@@ -30,6 +37,16 @@ namespace SpotifyClone.Maui.Services
             if (_currentPlayer != null && _currentPlayer.IsPlaying)
             {
                 _currentPlayer.Stop();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_currentPlayer != null)
+            {
+                _currentPlayer.Stop();
+                _currentPlayer.Dispose();
+                _currentPlayer = null;
             }
         }
     }

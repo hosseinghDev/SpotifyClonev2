@@ -36,7 +36,7 @@ namespace SpotifyClone.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs([FromQuery] string search)
+        public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs([FromQuery] string? search)
         {
             // Start with a clean query
             var query = _context.Songs.Include(s => s.Singer).AsQueryable();
@@ -81,18 +81,46 @@ namespace SpotifyClone.Api.Controllers
                 return NotFound("Song metadata not found.");
             }
 
-            var filePath = Path.Combine(_hostingEnvironment.WebRootPath, song.FilePath);
+            // --- New, More Robust Path Logic ---
+            // Get the base wwwroot path
+            var wwwRootPath = _hostingEnvironment.WebRootPath;
 
-            _logger.LogInformation($"StreamSong: Attempting to stream file from path: {filePath}"); // <-- LOG THE PATH
+            // Sanitize the relative path from the database to remove any leading slashes
+            // that might confuse the path logic.
+            var relativePath = song.FilePath.TrimStart('/', '\\');
 
-            if (!System.IO.File.Exists(filePath))
+            // Manually combine the path components. This is more explicit than Path.Combine
+            // which can sometimes have subtle cross-platform differences.
+            var fullPath = Path.Combine(wwwRootPath, relativePath);
+
+            _logger.LogInformation($"StreamSong: Attempting to stream file from fully constructed path: {fullPath}");
+
+            if (!System.IO.File.Exists(fullPath))
             {
-                _logger.LogError($"StreamSong: File does not exist on server at path: {filePath}");
-                return NotFound("File not found on server.");
+                _logger.LogError($"StreamSong: CRITICAL - File does not exist on server at path: {fullPath}");
+                // For debugging, let's also log what's in the directory.
+                try
+                {
+                    var directoryPath = Path.GetDirectoryName(fullPath);
+                    if (Directory.Exists(directoryPath))
+                    {
+                        var filesInDir = Directory.GetFiles(directoryPath);
+                        _logger.LogInformation($"Files in directory '{directoryPath}': {string.Join(", ", filesInDir)}");
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Directory does not exist: {directoryPath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error while trying to list directory contents for debugging.");
+                }
+
+                return NotFound("Audio file not found on the server.");
             }
 
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            // Return as audio/mpeg and enable range processing for seeking
+            var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             return File(stream, "audio/mpeg", enableRangeProcessing: true);
         }
 
