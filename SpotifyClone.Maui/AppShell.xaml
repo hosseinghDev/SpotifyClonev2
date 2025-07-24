@@ -4,11 +4,48 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:SpotifyClone.Maui.Views"
+    xmlns:services="clr-namespace:SpotifyClone.Maui.Services"
+    x:DataType="services:GlobalAudioService"
     Shell.FlyoutBehavior="Disabled"
     Shell.TabBarBackgroundColor="#2a2a2a"
     Shell.TabBarTitleColor="#1DB954"
     Shell.TabBarUnselectedColor="Gray">
 
+    <!-- The invalid <Shell.BindingContext> block has been REMOVED from the XAML -->
+
+    <!-- This ItemTemplate wraps every page with our Grid layout -->
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid RowDefinitions="*,Auto" BackgroundColor="#121212">
+
+                <!-- This is where the actual page content will be displayed -->
+                <ContentPresenter Grid.Row="0" Content="{Binding}" />
+
+                <!-- The Mini Player UI -->
+                <!-- It uses RelativeSource binding to find the Shell's BindingContext, which is set in the code-behind -->
+                <!-- In AppShell.xaml -->
+                <!-- The Mini Player UI -->
+                <Frame Grid.Row="1" BackgroundColor="#353535" Padding="5" 
+       BorderColor="Transparent" CornerRadius="5" Margin="5,0,5,5"
+       IsVisible="{Binding BindingContext.IsVisible, Source={RelativeSource AncestorType={x:Type Shell}}}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.GoToPlayerPageCommand, Source={RelativeSource AncestorType={x:Type Shell}}}" />
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                        <Image Grid.Column="0" Source="{Binding BindingContext.CurrentSong.ImageUrl, Source={RelativeSource AncestorType={x:Type Shell}}, TargetNullValue='dotnet_bot.png'}" WidthRequest="40" HeightRequest="40" Aspect="AspectFill"/>
+                        <Label Grid.Column="1" Text="{Binding BindingContext.CurrentSong.Title, Source={RelativeSource AncestorType={x:Type Shell}}}" TextColor="White" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+                        <ImageButton Grid.Column="2" 
+                     Source="{Binding BindingContext.PlayPauseButtonIcon, Source={RelativeSource AncestorType={x:Type Shell}}}" 
+                     Command="{Binding BindingContext.TogglePlayPauseCommand, Source={RelativeSource AncestorType={x:Type Shell}}}" 
+                     BackgroundColor="Transparent"
+                     WidthRequest="35" HeightRequest="35"/>
+                    </Grid>
+                </Frame>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <!-- The TabBar defines our main navigation -->
     <TabBar>
         <ShellContent Title="Home" Icon="home.png" ContentTemplate="{DataTemplate views:HomePage}" Route="HomePage" />
         <ShellContent Title="Playlists" Icon="library.png" ContentTemplate="{DataTemplate views:PlaylistPage}" Route="PlaylistPage" />

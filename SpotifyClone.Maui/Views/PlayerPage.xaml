@@ -1,47 +1,53 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="SpotifyClone.Maui.Views.PlayerPage"
              xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
              x:DataType="viewmodel:PlayerViewModel"
-             Title="{Binding Title}" BackgroundColor="#121212">
+             Title="Now Playing" 
+             BackgroundColor="#121212">
+
     <Grid Padding="20" RowDefinitions="*, Auto, Auto, Auto, Auto" RowSpacing="15">
 
         <Border Grid.Row="0" StrokeShape="Rectangle" StrokeThickness="0" Margin="20" HorizontalOptions="Center" VerticalOptions="Center">
-            <Image Aspect="AspectFit" Source="{Binding Song.ImageUrl, TargetNullValue='dotnet_bot.png'}" WidthRequest="300" HeightRequest="300"/>
+            <Image Aspect="AspectFit" Source="{Binding CurrentSong.ImageUrl, TargetNullValue='dotnet_bot.png'}" WidthRequest="300" HeightRequest="300"/>
         </Border>
 
         <VerticalStackLayout Grid.Row="1" HorizontalOptions="FillAndExpand" Spacing="5">
-            <Label Text="{Binding Song.Title}" TextColor="White" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
-            <Label Text="{Binding Song.SingerName}" TextColor="Gray" FontSize="18" HorizontalTextAlignment="Center"/>
+            <Label Text="{Binding CurrentSong.Title}" TextColor="White" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+            <Label Text="{Binding CurrentSong.SingerName}" TextColor="Gray" FontSize="18" HorizontalTextAlignment="Center"/>
         </VerticalStackLayout>
 
-        <!-- Progress Bar and Timers -->
         <Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto" ColumnSpacing="10" VerticalOptions="Center">
             <Label Grid.Column="0" Text="{Binding PositionText}" TextColor="Gray" FontSize="12"/>
+
             <Slider Grid.Column="1" 
                     Maximum="{Binding Duration}" 
                     Value="{Binding CurrentPosition}"
                     ThumbColor="#1DB954" 
                     MinimumTrackColor="#1DB954" 
-                    MaximumTrackColor="Gray"
-                    DragCompletedCommand="{Binding SeekCommand}"/>
+                    MaximumTrackColor="Gray">
+                <Slider.Behaviors>
+                    <!-- CORRECTED BEHAVIOR -->
+                    <toolkit:EventToCommandBehavior
+                        EventName="DragCompleted"
+                        Command="{Binding SeekCommand}" />
+                </Slider.Behaviors>
+            </Slider>
+
             <Label Grid.Column="2" Text="{Binding DurationText}" TextColor="Gray" FontSize="12"/>
         </Grid>
 
-        <!-- Player Controls -->
         <HorizontalStackLayout Grid.Row="3" Spacing="40" HorizontalOptions="Center" Margin="0,10">
             <ImageButton Source="shuffle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
             <ImageButton Source="skip_previous.png" WidthRequest="40" HeightRequest="40" BackgroundColor="Transparent"/>
-
             <ImageButton Source="{Binding PlayPauseButtonIcon}"
                          Command="{Binding TogglePlayPauseCommand}"
-                         WidthRequest="70" 
-                         HeightRequest="70" 
-                         BackgroundColor="Transparent"/>
-
+                         WidthRequest="70" HeightRequest="70" BackgroundColor="Transparent"/>
             <ImageButton Source="skip_next.png" WidthRequest="40" HeightRequest="40" BackgroundColor="Transparent"/>
             <ImageButton Source="repeat.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
         </HorizontalStackLayout>
     </Grid>
+
 </ContentPage>

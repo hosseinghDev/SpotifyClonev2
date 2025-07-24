@@ -2,107 +2,64 @@
 using CommunityToolkit.Mvvm.Input;
 using SpotifyClone.Maui.Models;
 using SpotifyClone.Maui.Services;
-using System.IO;
-using System.Net.Http;
+using System.ComponentModel;
 
 namespace SpotifyClone.Maui.ViewModels
 {
     public partial class PlayerViewModel : BaseViewModel
     {
-        private readonly AudioPlayerService _audioPlayerService;
-        private readonly HttpClient _httpClient;
-        private IDispatcherTimer? _timer;
+        private readonly GlobalAudioService _globalAudioService;
 
+        public Song? CurrentSong => _globalAudioService.CurrentSong;
+        public double Duration => _globalAudioService.Duration;
+
+        // This property is now used for both displaying and setting the position
         [ObservableProperty]
-        Song? song;
+        private double currentPosition;
 
-        [ObservableProperty]
-        double duration;
+        public bool IsPlaying => _globalAudioService.IsPlaying;
+        public string PlayPauseButtonIcon => _globalAudioService.PlayPauseButtonIcon;
 
-        [ObservableProperty]
-        double currentPosition;
+        public string PositionText => TimeSpan.FromSeconds(CurrentPosition).ToString(@"mm\:ss");
+        public string DurationText => TimeSpan.FromSeconds(Duration).ToString(@"mm\:ss");
 
-        [ObservableProperty]
-        string positionText = "00:00";
-
-        [ObservableProperty]
-        string durationText = "00:00";
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(PlayPauseButtonIcon))]
-        bool isPlaying;
-
-        public string PlayPauseButtonIcon => IsPlaying ? "pause_circle.png" : "play_circle.png";
-
-        public PlayerViewModel(Song song, AudioPlayerService audioPlayerService)
+        public PlayerViewModel(GlobalAudioService globalAudioService)
         {
-            Title = "Now Playing";
-            Song = song;
-            _audioPlayerService = audioPlayerService;
-            _httpClient = new HttpClient();
+            _globalAudioService = globalAudioService;
+            _globalAudioService.PropertyChanged += GlobalAudioService_PropertyChanged;
         }
 
-        public async Task PlayAudio()
+        private void GlobalAudioService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (Song == null || string.IsNullOrEmpty(Song.FileUrl)) return;
-
-            IsBusy = true;
-            try
+            // Only update our copy of CurrentPosition if the service changes it
+            if (e.PropertyName == nameof(_globalAudioService.CurrentPosition))
             {
-                using var networkStream = await _httpClient.GetStreamAsync(Song.FileUrl);
-                var memoryStream = new MemoryStream();
-                await networkStream.CopyToAsync(memoryStream);
-                memoryStream.Position = 0;
-
-                await _audioPlayerService.PlayAudio(memoryStream);
-
-                Duration = _audioPlayerService.GetDuration();
-                DurationText = TimeSpan.FromSeconds(Duration).ToString(@"mm\:ss");
-
-                _timer = Application.Current!.Dispatcher.CreateTimer();
-                _timer.Interval = TimeSpan.FromMilliseconds(200);
-                _timer.Tick += (s, e) =>
-                {
-                    CurrentPosition = _audioPlayerService.GetCurrentPosition();
-                    PositionText = TimeSpan.FromSeconds(CurrentPosition).ToString(@"mm\:ss");
-                    IsPlaying = _audioPlayerService.IsPlaying;
-                };
-                _timer.Start();
+                CurrentPosition = _globalAudioService.CurrentPosition;
             }
-            catch (System.Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Playback Error", $"Could not load audio: {ex.Message}", "OK");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
 
-        [RelayCommand]
-        private void Seek()
-        {
-            _audioPlayerService.Seek(CurrentPosition);
+            OnPropertyChanged(e.PropertyName);
+            if (e.PropertyName is nameof(CurrentPosition)) OnPropertyChanged(nameof(PositionText));
+            if (e.PropertyName is nameof(Duration)) OnPropertyChanged(nameof(DurationText));
         }
 
         [RelayCommand]
         private void TogglePlayPause()
         {
-            if (IsPlaying)
-            {
-                _audioPlayerService.Pause();
-            }
-            else
-            {
-                _audioPlayerService.Play();
-            }
-            IsPlaying = _audioPlayerService.IsPlaying;
+            _globalAudioService.TogglePlayPause();
         }
 
-        public void StopAudio()
+        // CORRECTED SEEK COMMAND
+        [RelayCommand]
+        private void Seek()
         {
-            _timer?.Stop();
-            _audioPlayerService.StopAudio();
+            // The Slider's Value is two-way bound to our CurrentPosition property.
+            // When DragCompleted is fired, the value is already updated here.
+            _globalAudioService.Seek(this.CurrentPosition);
+        }
+
+        public void Cleanup()
+        {
+            _globalAudioService.PropertyChanged -= GlobalAudioService_PropertyChanged;
         }
     }
 }

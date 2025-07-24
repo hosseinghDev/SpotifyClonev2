@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
 using SpotifyClone.Maui.Services;
 using SpotifyClone.Maui.ViewModels;
@@ -13,6 +14,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -25,7 +27,7 @@ public static class MauiProgram
         // Services
         builder.Services.AddSingleton<ApiService>();
         builder.Services.AddSingleton(AudioManager.Current);
-        builder.Services.AddSingleton<AudioPlayerService>();
+        builder.Services.AddSingleton<GlobalAudioService>(); // <-- REGISTER NEW SERVICE
 
         // ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -37,6 +39,9 @@ public static class MauiProgram
         builder.Services.AddTransient<SingerProfileViewModel>();
         builder.Services.AddTransient<CommentsViewModel>();
         builder.Services.AddTransient<SingerCommentsViewModel>();
+        builder.Services.AddTransient<PlayerViewModel>();
+
+        // REMOVED PlayerViewModel registration
 
         // Views (Pages)
         builder.Services.AddTransient<LoginPage>();
@@ -48,6 +53,9 @@ public static class MauiProgram
         builder.Services.AddTransient<SingerProfilePage>();
         builder.Services.AddTransient<CommentsPage>();
         builder.Services.AddTransient<SingerCommentsPage>();
+        builder.Services.AddTransient<PlayerPage>();
+
+        // REMOVED PlayerPage registration
 
         return builder.Build();
     }

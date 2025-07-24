@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using SpotifyClone.Maui.Models;
 using SpotifyClone.Maui.Services;
-using SpotifyClone.Maui.Views;
 using System.Collections.ObjectModel;
 
 namespace SpotifyClone.Maui.ViewModels
@@ -11,16 +10,16 @@ namespace SpotifyClone.Maui.ViewModels
     public partial class PlaylistDetailViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
-        private readonly AudioPlayerService _audioPlayerService;
+        private readonly GlobalAudioService _globalAudioService; // <-- CHANGE to GlobalAudioService
 
         [ObservableProperty] int playlistId;
-        [ObservableProperty] Playlist playlist;
+        [ObservableProperty] Playlist? playlist;
         [ObservableProperty] ObservableCollection<Song> songs;
 
-        public PlaylistDetailViewModel(ApiService apiService, AudioPlayerService audioPlayerService)
+        public PlaylistDetailViewModel(ApiService apiService, GlobalAudioService globalAudioService) // <-- INJECT GlobalAudioService
         {
             _apiService = apiService;
-            _audioPlayerService = audioPlayerService;
+            _globalAudioService = globalAudioService; // <-- INITIALIZE
             Songs = new ObservableCollection<Song>();
         }
 
@@ -64,11 +63,12 @@ namespace SpotifyClone.Maui.ViewModels
             }
         }
 
+        // THIS COMMAND IS NOW DIFFERENT
         [RelayCommand]
         async Task PlaySong(Song song)
         {
             if (song == null) return;
-            await Shell.Current.Navigation.PushAsync(new PlayerPage(new PlayerViewModel(song, _audioPlayerService)));
+            await _globalAudioService.PlaySong(song);
         }
     }
 }
