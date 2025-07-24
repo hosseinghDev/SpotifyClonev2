@@ -1,6 +1,5 @@
 ﻿using Plugin.Maui.Audio;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace SpotifyClone.Maui.Services
 {
@@ -17,11 +16,7 @@ namespace SpotifyClone.Maui.Services
 
         public async Task PlayAudio(Stream audioStream)
         {
-            if (_currentPlayer != null)
-            {
-                _currentPlayer.Stop();
-                _currentPlayer.Dispose();
-            }
+            StopAudio(); // Stop any previous track
 
             _currentStream = audioStream;
             if (_currentStream == null || _currentStream.Length == 0) return;
@@ -29,6 +24,12 @@ namespace SpotifyClone.Maui.Services
             _currentPlayer = _audioManager.CreatePlayer(_currentStream);
             _currentPlayer.Play();
         }
+
+        // NEW Methods for Play/Pause
+        public void Play() => _currentPlayer?.Play();
+        public void Pause() => _currentPlayer?.Pause();
+        public bool IsPlaying => _currentPlayer?.IsPlaying ?? false;
+
 
         public double GetDuration() => _currentPlayer?.Duration ?? 0;
         public double GetCurrentPosition() => _currentPlayer?.CurrentPosition ?? 0;
@@ -41,22 +42,18 @@ namespace SpotifyClone.Maui.Services
 
         public void StopAudio()
         {
-            if (_currentPlayer != null && _currentPlayer.IsPlaying)
-            {
-                _currentPlayer.Stop();
-            }
-        }
-
-        public void Dispose()
-        {
             if (_currentPlayer != null)
             {
-                _currentPlayer.Stop();
+                if (_currentPlayer.IsPlaying)
+                {
+                    _currentPlayer.Stop();
+                }
+                // Dispose of the player and stream to free resources
                 _currentPlayer.Dispose();
                 _currentPlayer = null;
+                _currentStream?.Dispose();
+                _currentStream = null;
             }
-            _currentStream?.Dispose();
-            _currentStream = null;
         }
     }
 }

@@ -4,7 +4,6 @@ using SpotifyClone.Maui.Models;
 using SpotifyClone.Maui.Services;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace SpotifyClone.Maui.ViewModels
 {
@@ -29,6 +28,12 @@ namespace SpotifyClone.Maui.ViewModels
         [ObservableProperty]
         string durationText = "00:00";
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(PlayPauseButtonIcon))]
+        bool isPlaying;
+
+        public string PlayPauseButtonIcon => IsPlaying ? "pause_circle.png" : "play_circle.png";
+
         public PlayerViewModel(Song song, AudioPlayerService audioPlayerService)
         {
             Title = "Now Playing";
@@ -51,17 +56,16 @@ namespace SpotifyClone.Maui.ViewModels
 
                 await _audioPlayerService.PlayAudio(memoryStream);
 
-                // Set duration for the slider
                 Duration = _audioPlayerService.GetDuration();
                 DurationText = TimeSpan.FromSeconds(Duration).ToString(@"mm\:ss");
 
-                // Start a timer to update the current position
                 _timer = Application.Current!.Dispatcher.CreateTimer();
                 _timer.Interval = TimeSpan.FromMilliseconds(200);
                 _timer.Tick += (s, e) =>
                 {
                     CurrentPosition = _audioPlayerService.GetCurrentPosition();
                     PositionText = TimeSpan.FromSeconds(CurrentPosition).ToString(@"mm\:ss");
+                    IsPlaying = _audioPlayerService.IsPlaying;
                 };
                 _timer.Start();
             }
@@ -76,12 +80,23 @@ namespace SpotifyClone.Maui.ViewModels
         }
 
         [RelayCommand]
-        // In PlayerViewModel.cs
         private void Seek()
         {
-            // The Slider's Value is already bound to CurrentPosition,
-            // so we just use that property's current value.
             _audioPlayerService.Seek(CurrentPosition);
+        }
+
+        [RelayCommand]
+        private void TogglePlayPause()
+        {
+            if (IsPlaying)
+            {
+                _audioPlayerService.Pause();
+            }
+            else
+            {
+                _audioPlayerService.Play();
+            }
+            IsPlaying = _audioPlayerService.IsPlaying;
         }
 
         public void StopAudio()
