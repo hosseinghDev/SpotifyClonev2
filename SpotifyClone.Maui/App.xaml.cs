@@ -1,4 +1,6 @@
-﻿namespace SpotifyClone.Maui;
+﻿using SpotifyClone.Maui.Services; // <-- Add this using
+
+namespace SpotifyClone.Maui;
 
 public partial class App : Application
 {
@@ -6,7 +8,6 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        // Check if user is logged in
         var token = SecureStorage.GetAsync("auth_token").Result;
         if (string.IsNullOrEmpty(token))
         {
@@ -14,7 +15,8 @@ public partial class App : Application
         }
         else
         {
-            MainPage = new AppShell();
+            // Resolve the fully constructed AppShell from the DI container
+            MainPage = IPlatformApplication.Current.Services.GetRequiredService<AppShell>();
         }
     }
 }

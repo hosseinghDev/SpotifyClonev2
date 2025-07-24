@@ -5,12 +5,13 @@ namespace SpotifyClone.Maui;
 
 public partial class AppShell : Shell
 {
-    public AppShell()
+    public AppShell(GlobalAudioService globalAudioService)
     {
         InitializeComponent();
 
-        // Set the binding context to the instance from the DI container
-        BindingContext = IPlatformApplication.Current.Services.GetService<GlobalAudioService>();
+        // Set the binding context to the singleton service instance
+        // This will now work correctly for the mini-player Frame.
+        BindingContext = globalAudioService;
 
         Routing.RegisterRoute(nameof(PlayerPage), typeof(PlayerPage));
         Routing.RegisterRoute(nameof(PlaylistDetailPage), typeof(PlaylistDetailPage));

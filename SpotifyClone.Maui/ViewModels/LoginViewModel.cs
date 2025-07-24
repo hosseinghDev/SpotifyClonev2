@@ -9,16 +9,18 @@ namespace SpotifyClone.Maui.ViewModels
     public partial class LoginViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
+        private readonly IServiceProvider _serviceProvider; // Inject the service provider
 
         [ObservableProperty]
-        string username;
+        string? username;
 
         [ObservableProperty]
-        string password;
+        string? password;
 
-        public LoginViewModel(ApiService apiService)
+        public LoginViewModel(ApiService apiService, IServiceProvider serviceProvider) // <-- Add IServiceProvider
         {
             _apiService = apiService;
+            _serviceProvider = serviceProvider; // <-- Initialize
             Title = "Login";
         }
 
@@ -42,7 +44,8 @@ namespace SpotifyClone.Maui.ViewModels
                 {
                     await SecureStorage.SetAsync("auth_token", user.Token);
                     await _apiService.SetAuthToken();
-                    Application.Current.MainPage = new AppShell();
+                    // CORRECTED: Get the shell from the service provider
+                    Application.Current.MainPage = _serviceProvider.GetRequiredService<AppShell>();
                 }
                 else
                 {

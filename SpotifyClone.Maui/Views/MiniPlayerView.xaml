@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:services="clr-namespace:SpotifyClone.Maui.Services"
+             x:DataType="services:GlobalAudioService"
+             x:Class="SpotifyClone.Maui.Views.MiniPlayerView">
+    <StackLayout>
+        <ProgressBar Progress="{Binding PlaybackProgress}"
+                     ProgressColor="#1DB954" BackgroundColor="Gray" HeightRequest="3"/>
+        <Grid Padding="8,5,8,8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+            <Image Grid.Column="0" Source="{Binding CurrentSong.ImageUrl, TargetNullValue='dotnet_bot.png'}" WidthRequest="40" HeightRequest="40" Aspect="AspectFill"/>
+            <Label Grid.Column="1" Text="{Binding CurrentSong.Title}" TextColor="White" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+            <ImageButton Grid.Column="2" 
+                         Source="{Binding PlayPauseButtonIcon}" 
+                         Command="{Binding TogglePlayPauseCommand}" 
+                         BackgroundColor="Transparent"
+                         WidthRequest="35" HeightRequest="35"/>
+        </Grid>
+    </StackLayout>
+</ContentView>

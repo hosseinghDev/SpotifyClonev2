@@ -25,34 +25,21 @@ namespace SpotifyClone.Maui.Services
         private bool isPlaying;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(PlaybackProgress))] // Notify progress changes
+        [NotifyPropertyChangedFor(nameof(PlaybackProgress))]
         private double currentPosition;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(PlaybackProgress))] // Notify progress changes
+        [NotifyPropertyChangedFor(nameof(PlaybackProgress))]
         private double duration;
 
         public bool IsVisible => CurrentSong != null;
         public string PlayPauseButtonIcon => IsPlaying ? "pause_circle.png" : "play_circle.png";
-
-        // NEW: Calculated property for the progress bar
         public double PlaybackProgress => (Duration > 0) ? CurrentPosition / Duration : 0;
 
-        public GlobalAudioService(IAudioManager audioManager)
+        public GlobalAudioService(IAudioManager audioManager) // <-- Simplified constructor
         {
             _audioManager = audioManager;
             _httpClient = new HttpClient();
-
-            _timer = Application.Current!.Dispatcher.CreateTimer();
-            _timer.Interval = TimeSpan.FromMilliseconds(200);
-            _timer.Tick += (s, e) =>
-            {
-                if (_currentPlayer != null)
-                {
-                    CurrentPosition = _currentPlayer.CurrentPosition;
-                    IsPlaying = _currentPlayer.IsPlaying;
-                }
-            };
         }
 
         public async Task PlaySong(Song song)
@@ -72,13 +59,22 @@ namespace SpotifyClone.Maui.Services
                 var memoryStream = new MemoryStream();
                 await networkStream.CopyToAsync(memoryStream);
                 memoryStream.Position = 0;
-
                 _currentStream = memoryStream;
                 _currentPlayer = _audioManager.CreatePlayer(_currentStream);
-
                 _currentPlayer.Play();
                 Duration = _currentPlayer.Duration;
-                _timer?.Start();
+
+                _timer = Application.Current!.Dispatcher.CreateTimer();
+                _timer.Interval = TimeSpan.FromMilliseconds(200);
+                _timer.Tick += (s, e) =>
+                {
+                    if (_currentPlayer != null)
+                    {
+                        CurrentPosition = _currentPlayer.CurrentPosition;
+                        IsPlaying = _currentPlayer.IsPlaying;
+                    }
+                };
+                _timer.Start();
                 await GoToPlayerPage();
             }
             catch (Exception) { Stop(); }
@@ -92,20 +88,15 @@ namespace SpotifyClone.Maui.Services
             IsPlaying = _currentPlayer.IsPlaying;
         }
 
-        public void Seek(double position)
-        {
-            _currentPlayer?.Seek(position);
-        }
+        public void Seek(double position) => _currentPlayer?.Seek(position);
 
         [RelayCommand]
-        async Task GoToPlayerPage()
-        {
-            await Shell.Current.GoToAsync(nameof(PlayerPage));
-        }
+        async Task GoToPlayerPage() => await Shell.Current.GoToAsync(nameof(PlayerPage));
 
         public void Stop()
         {
             _timer?.Stop();
+            _timer = null;
             if (_currentPlayer != null)
             {
                 if (_currentPlayer.IsPlaying) _currentPlayer.Stop();

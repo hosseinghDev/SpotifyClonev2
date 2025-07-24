@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using Plugin.Maui.Audio;
 using SpotifyClone.Maui.Services;
@@ -25,9 +26,13 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         // Services
+        //builder.Services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
         builder.Services.AddSingleton<ApiService>();
         builder.Services.AddSingleton(AudioManager.Current);
         builder.Services.AddSingleton<GlobalAudioService>(); // <-- REGISTER NEW SERVICE
+
+        // Tell the DI container about the AppShell
+        builder.Services.AddSingleton<AppShell>(); // <-- ADD THIS
 
         // ViewModels
         builder.Services.AddTransient<LoginViewModel>();
