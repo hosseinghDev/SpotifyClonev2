@@ -8,5 +8,7 @@
         public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
         public ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        // Inside the User class
+        public ICollection<UserLikedSong> LikedSongs { get; set; } = new List<UserLikedSong>();
     }
 }

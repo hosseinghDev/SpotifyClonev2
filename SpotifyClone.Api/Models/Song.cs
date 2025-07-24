@@ -12,5 +12,7 @@
         public Singer Singer { get; set; } = null!;
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
+        // Inside the Song class
+        public ICollection<UserLikedSong> LikedByUsers { get; set; } = new List<UserLikedSong>();
     }
 }

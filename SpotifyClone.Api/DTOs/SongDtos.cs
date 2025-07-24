@@ -9,6 +9,7 @@
         public string? Genre { get; set; }
         public string? FileUrl { get; set; }
         public string? ImageUrl { get; set; }
+        public bool IsLiked { get; set; }
     }
 
     public class SongUploadDto

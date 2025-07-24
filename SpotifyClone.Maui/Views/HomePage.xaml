@@ -11,10 +11,12 @@
                    SearchCommand="{Binding LoadSongsCommand}" BackgroundColor="#2a2a2a" PlaceholderColor="Gray" TextColor="White" Margin="10"/>
 
         <CollectionView Grid.Row="1" ItemsSource="{Binding Songs}" SelectionMode="None">
+            <!-- In HomePage.xaml -->
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Song">
-                    <Grid Padding="10" ColumnDefinitions="Auto, *, Auto, Auto" RowSpacing="5">
+                    <Grid Padding="10" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" RowSpacing="5">
                         <Grid.GestureRecognizers>
+                            <!-- Keep the main tap gesture for playing the song -->
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=PlaySongCommand}" CommandParameter="{Binding .}"/>
                         </Grid.GestureRecognizers>
 
@@ -31,10 +33,20 @@
                             </Label>
                         </VerticalStackLayout>
 
-                        <ImageButton Grid.Column="2" Source="comments.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
-                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
+                        <!-- Like Button -->
+                        <ImageButton Grid.Column="2" Source="{Binding IsLiked, Converter={StaticResource BoolToHeartIconConverter}}" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=ToggleLikeCommand}" CommandParameter="{Binding .}"/>
 
-                        <ImageButton Grid.Column="3" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
+                        <!-- Add to Playlist Button -->
+                        <ImageButton Grid.Column="3" Source="plus_circle.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent" Margin="5,0"
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=AddToPlaylistCommand}" CommandParameter="{Binding .}"/>
+
+                        <!-- Comments Button -->
+                        <ImageButton Grid.Column="4" Source="comments.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
+
+                        <!-- Play Indicator (no command, just visual) -->
+                        <ImageButton Grid.Column="5" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SpotifyClone.Api.Controllers
@@ -35,15 +36,18 @@ namespace SpotifyClone.Api.Controllers
             return $"{request.Scheme}://{request.Host}";
         }
 
+        // In SongsController.cs
         [HttpGet]
+        [Authorize] // <-- Add Authorize attribute to get the user ID
         public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs([FromQuery] string? search)
         {
-            // Start with a clean query
+            // Get the current user's ID from the token
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var query = _context.Songs.Include(s => s.Singer).AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                // Apply search filter if provided
                 var searchTerm = search.ToLower();
                 query = query.Where(s => s.Title.ToLower().Contains(searchTerm) ||
                                          s.Singer.Name.ToLower().Contains(searchTerm) ||
@@ -52,7 +56,6 @@ namespace SpotifyClone.Api.Controllers
 
             var baseUrl = GetBaseUrl();
 
-            // Project the results into DTOs
             var songs = await query
                 .Select(s => new SongDto
                 {
@@ -61,14 +64,14 @@ namespace SpotifyClone.Api.Controllers
                     SingerName = s.Singer.Name,
                     SingerId = s.SingerId,
                     Genre = s.Genre,
-                    // The streaming URL points to our controller action
                     FileUrl = $"{baseUrl}/api/songs/stream/{s.Id}",
-                    // The image URL points directly to the static file path
-                    ImageUrl = string.IsNullOrEmpty(s.ImageUrl) ? null : $"{baseUrl}/{s.ImageUrl}"
+                    ImageUrl = string.IsNullOrEmpty(s.ImageUrl) ? null : $"{baseUrl}/{s.ImageUrl}",
+                    // Check if there's an entry in UserLikedSongs for this song and user
+                    IsLiked = _context.UserLikedSongs.Any(uls => uls.SongId == s.Id && uls.UserId == userId)
                 })
                 .ToListAsync();
 
-            return Ok(songs); // <-- ALWAYS WRAP IN OK() FOR CONSISTENCY
+            return Ok(songs);
         }
 
         [HttpGet("stream/{id}")]

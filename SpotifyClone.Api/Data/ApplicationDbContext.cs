@@ -13,6 +13,7 @@ namespace SpotifyClone.Api.Data
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<UserLikedSong> UserLikedSongs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +48,23 @@ namespace SpotifyClone.Api.Data
                 .WithMany(s => s.Comments)
                 .HasForeignKey(c => c.SingerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Composite key for UserLikedSong
+            modelBuilder.Entity<UserLikedSong>()
+                .HasKey(uls => new { uls.UserId, uls.SongId });
+
+            // Relationships for UserLikedSong
+            modelBuilder.Entity<UserLikedSong>()
+                .HasOne(uls => uls.User)
+                .WithMany(u => u.LikedSongs)
+                .HasForeignKey(uls => uls.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserLikedSong>()
+                .HasOne(uls => uls.Song)
+                .WithMany(s => s.LikedByUsers)
+                .HasForeignKey(uls => uls.SongId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
