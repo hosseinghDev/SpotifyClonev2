@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SpotifyClone.Maui.Models;
 using SpotifyClone.Maui.Services;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -9,19 +11,29 @@ namespace SpotifyClone.Maui.ViewModels
     public partial class PlayerViewModel : BaseViewModel
     {
         private readonly AudioPlayerService _audioPlayerService;
-        private readonly HttpClient _httpClient; // Use a dedicated HttpClient for this
+        private readonly HttpClient _httpClient;
+        private IDispatcherTimer? _timer;
 
         [ObservableProperty]
         Song? song;
 
-        // We now inject ApiService to get the base URL
+        [ObservableProperty]
+        double duration;
+
+        [ObservableProperty]
+        double currentPosition;
+
+        [ObservableProperty]
+        string positionText = "00:00";
+
+        [ObservableProperty]
+        string durationText = "00:00";
+
         public PlayerViewModel(Song song, AudioPlayerService audioPlayerService)
         {
             Title = "Now Playing";
             Song = song;
             _audioPlayerService = audioPlayerService;
-
-            // Create a simple HttpClient. It doesn't need the full ApiService.
             _httpClient = new HttpClient();
         }
 
@@ -32,11 +44,26 @@ namespace SpotifyClone.Maui.ViewModels
             IsBusy = true;
             try
             {
-                // Use our own HttpClient to download the song stream
-                var audioStream = await _httpClient.GetStreamAsync(Song.FileUrl);
+                using var networkStream = await _httpClient.GetStreamAsync(Song.FileUrl);
+                var memoryStream = new MemoryStream();
+                await networkStream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
 
-                // Pass the downloaded stream to the audio player
-                await _audioPlayerService.PlayAudio(audioStream);
+                await _audioPlayerService.PlayAudio(memoryStream);
+
+                // Set duration for the slider
+                Duration = _audioPlayerService.GetDuration();
+                DurationText = TimeSpan.FromSeconds(Duration).ToString(@"mm\:ss");
+
+                // Start a timer to update the current position
+                _timer = Application.Current!.Dispatcher.CreateTimer();
+                _timer.Interval = TimeSpan.FromMilliseconds(200);
+                _timer.Tick += (s, e) =>
+                {
+                    CurrentPosition = _audioPlayerService.GetCurrentPosition();
+                    PositionText = TimeSpan.FromSeconds(CurrentPosition).ToString(@"mm\:ss");
+                };
+                _timer.Start();
             }
             catch (System.Exception ex)
             {
@@ -48,6 +75,19 @@ namespace SpotifyClone.Maui.ViewModels
             }
         }
 
-        public void StopAudio() => _audioPlayerService.StopAudio();
+        [RelayCommand]
+        // In PlayerViewModel.cs
+        private void Seek()
+        {
+            // The Slider's Value is already bound to CurrentPosition,
+            // so we just use that property's current value.
+            _audioPlayerService.Seek(CurrentPosition);
+        }
+
+        public void StopAudio()
+        {
+            _timer?.Stop();
+            _audioPlayerService.StopAudio();
+        }
     }
 }
