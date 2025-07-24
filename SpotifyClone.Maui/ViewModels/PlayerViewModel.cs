@@ -16,7 +16,6 @@ namespace SpotifyClone.Maui.ViewModels
         public bool IsPlaying => _globalAudioService.IsPlaying;
         public string PlayPauseButtonIcon => _globalAudioService.PlayPauseButtonIcon;
 
-        // --- NEW PROPERTIES FOR BUTTON ICONS ---
         public string ShuffleIcon => _globalAudioService.ShuffleIcon;
         public string RepeatIcon => _globalAudioService.RepeatIcon;
 
@@ -31,16 +30,16 @@ namespace SpotifyClone.Maui.ViewModels
 
         private void GlobalAudioService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            // This is a "catch-all" to forward any property change from the service to the UI
             OnPropertyChanged(e.PropertyName);
 
-            // Notify UI of dependent property changes
+            // We also need to manually notify changes for properties that depend on others
             if (e.PropertyName is nameof(CurrentPosition)) OnPropertyChanged(nameof(PositionText));
             if (e.PropertyName is nameof(Duration)) OnPropertyChanged(nameof(DurationText));
             if (e.PropertyName is nameof(GlobalAudioService.IsShuffled)) OnPropertyChanged(nameof(ShuffleIcon));
             if (e.PropertyName is nameof(GlobalAudioService.RepeatMode)) OnPropertyChanged(nameof(RepeatIcon));
         }
 
-        // --- All commands now simply call the service ---
         [RelayCommand]
         private void TogglePlayPause() => _globalAudioService.TogglePlayPause();
 
@@ -58,7 +57,6 @@ namespace SpotifyClone.Maui.ViewModels
 
         [RelayCommand]
         private void ToggleRepeat() => _globalAudioService.ToggleRepeatCommand.Execute(null);
-
 
         public void Cleanup()
         {

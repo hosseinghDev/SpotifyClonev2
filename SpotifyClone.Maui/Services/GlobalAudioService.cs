@@ -58,8 +58,8 @@ namespace SpotifyClone.Maui.Services
                 return RepeatMode switch
                 {
                     RepeatMode.One => "repeat_one.png",
-                    RepeatMode.All => "repeat.png", // Use the highlighted version for 'All'
-                    _ => "repeat.png", // Use the standard version for 'None'
+                    RepeatMode.All => "repeat_on.png", // Use the highlighted icon for 'All'
+                    _ => "repeat.png", // Use the standard icon for 'None'
                 };
             }
         }
@@ -73,11 +73,14 @@ namespace SpotifyClone.Maui.Services
         public async Task StartPlayback(Song songToPlay, List<Song> songQueue)
         {
             _originalQueue = new List<Song>(songQueue);
-            _playbackQueue = new ObservableCollection<Song>(songQueue);
 
             if (IsShuffled)
             {
                 ShuffleQueue(songToPlay);
+            }
+            else
+            {
+                _playbackQueue = new ObservableCollection<Song>(_originalQueue);
             }
 
             _currentQueueIndex = _playbackQueue.IndexOf(songToPlay);
@@ -88,11 +91,10 @@ namespace SpotifyClone.Maui.Services
 
         private async Task PlayCurrentSongInQueue()
         {
-            Stop();
+            StopCurrentPlayer();
 
             if (_currentQueueIndex < 0 || _currentQueueIndex >= _playbackQueue.Count)
             {
-                // If index is out of bounds, stop playback
                 CurrentSong = null;
                 return;
             }
@@ -113,31 +115,37 @@ namespace SpotifyClone.Maui.Services
 
                 Duration = _currentPlayer.Duration;
 
-                _timer = Application.Current!.Dispatcher.CreateTimer();
-                _timer.Interval = TimeSpan.FromMilliseconds(200);
-                _timer.Tick += (s, e) =>
-                {
-                    if (_currentPlayer != null)
-                    {
-                        CurrentPosition = _currentPlayer.CurrentPosition;
-                        IsPlaying = _currentPlayer.IsPlaying;
-                    }
-                };
-                _timer.Start();
+                StartTimer();
             }
             catch (Exception) { Stop(); }
         }
 
-        private async void OnPlaybackEnded(object? sender, EventArgs e)
+        private void OnPlaybackEnded(object? sender, EventArgs e)
         {
             if (RepeatMode == RepeatMode.One)
             {
-                await PlayCurrentSongInQueue();
+                MainThread.BeginInvokeOnMainThread(async () => await PlayCurrentSongInQueue());
             }
             else
             {
-                await SkipNext();
+                MainThread.BeginInvokeOnMainThread(async () => await SkipNext());
             }
+        }
+
+        private void StartTimer()
+        {
+            _timer?.Stop();
+            _timer = Application.Current!.Dispatcher.CreateTimer();
+            _timer.Interval = TimeSpan.FromMilliseconds(200);
+            _timer.Tick += (s, e) =>
+            {
+                if (_currentPlayer != null)
+                {
+                    CurrentPosition = _currentPlayer.CurrentPosition;
+                    IsPlaying = _currentPlayer.IsPlaying;
+                }
+            };
+            _timer.Start();
         }
 
         [RelayCommand]
@@ -153,10 +161,9 @@ namespace SpotifyClone.Maui.Services
         [RelayCommand]
         async Task GoToPlayerPage() => await Shell.Current.GoToAsync(nameof(PlayerPage));
 
-        public void Stop()
+        private void StopCurrentPlayer()
         {
             _timer?.Stop();
-            _timer = null;
             if (_currentPlayer != null)
             {
                 _currentPlayer.PlaybackEnded -= OnPlaybackEnded;
@@ -167,10 +174,17 @@ namespace SpotifyClone.Maui.Services
             _currentStream?.Dispose();
             _currentStream = null;
             IsPlaying = false;
-            // Don't null out CurrentSong here, let the new track replace it
         }
 
-        // --- NEW COMMANDS ---
+        public void Stop()
+        {
+            StopCurrentPlayer();
+            CurrentSong = null;
+            _originalQueue.Clear();
+            _playbackQueue.Clear();
+            _currentQueueIndex = -1;
+        }
+
         [RelayCommand]
         private async Task SkipNext()
         {
@@ -181,13 +195,11 @@ namespace SpotifyClone.Maui.Services
             {
                 if (RepeatMode == RepeatMode.All)
                 {
-                    _currentQueueIndex = 0; // Loop back to the start
+                    _currentQueueIndex = 0;
                 }
                 else
                 {
-                    // End of playlist, stop playback
                     Stop();
-                    CurrentSong = null; // Hide the player
                     return;
                 }
             }
@@ -199,7 +211,6 @@ namespace SpotifyClone.Maui.Services
         {
             if (_playbackQueue.Count == 0) return;
 
-            // If more than 3 seconds in, restart the current song
             if (CurrentPosition > 3)
             {
                 Seek(0);
@@ -209,7 +220,7 @@ namespace SpotifyClone.Maui.Services
             _currentQueueIndex--;
             if (_currentQueueIndex < 0)
             {
-                _currentQueueIndex = 0; // Don't go past the beginning
+                _currentQueueIndex = 0;
             }
             await PlayCurrentSongInQueue();
         }
@@ -222,19 +233,22 @@ namespace SpotifyClone.Maui.Services
 
             if (IsShuffled)
             {
+                // Shuffle the original queue, keeping the current song at the top
                 ShuffleQueue(CurrentSong);
             }
             else
             {
-                // Restore original order
+                // Restore the original order
                 _playbackQueue = new ObservableCollection<Song>(_originalQueue);
             }
+            // Find the new index of the current song
             _currentQueueIndex = _playbackQueue.IndexOf(CurrentSong);
         }
 
         private void ShuffleQueue(Song firstSong)
         {
-            var shuffled = _originalQueue.OrderBy(x => Guid.NewGuid()).ToList();
+            var random = new Random();
+            var shuffled = _originalQueue.OrderBy(x => random.Next()).ToList();
             shuffled.Remove(firstSong);
             shuffled.Insert(0, firstSong);
             _playbackQueue = new ObservableCollection<Song>(shuffled);
