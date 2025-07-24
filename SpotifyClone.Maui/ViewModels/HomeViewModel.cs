@@ -113,6 +113,24 @@ namespace SpotifyClone.Maui.ViewModels
 
         [RelayCommand]
         async Task GoToComments(int songId) => await Shell.Current.GoToAsync($"{nameof(CommentsPage)}?songId={songId}");
+        // In HomeViewModel.cs, add this new command at the end of the file.
+
+        [RelayCommand]
+        async Task Logout()
+        {
+            bool confirm = await Shell.Current.DisplayAlert("Log Out", "Are you sure you want to log out?", "Yes", "No");
+            if (confirm)
+            {
+                // Stop any currently playing music
+                _globalAudioService.Stop();
+
+                // Clear the stored authentication token
+                SecureStorage.Default.Remove("auth_token");
+
+                // Set the main page of the application to the authentication shell
+                Application.Current.MainPage = new AppShell_Auth();
+            }
+        }
     }
 
     // Helper class for deserializing the like result

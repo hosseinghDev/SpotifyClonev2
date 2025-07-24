@@ -5,18 +5,33 @@
              xmlns:viewmodel="clr-namespace:SpotifyClone.Maui.ViewModels"
              xmlns:model="clr-namespace:SpotifyClone.Maui.Models"
              x:DataType="viewmodel:HomeViewModel"
-             Title="{Binding Title}" BackgroundColor="#121212">
-    <Grid RowDefinitions="Auto, *">
-        <SearchBar Grid.Row="0" Placeholder="Search songs, artists, genres..." Text="{Binding SearchText}"
+             Title="{Binding Title}" BackgroundColor="#121212"
+             Shell.NavBarIsVisible="False">
+    <!-- Hide the default nav bar -->
+
+    <Grid RowDefinitions="Auto, Auto, *">
+
+        <!-- Custom Title Bar with Logout Button -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="15,10">
+            <Label Text="Home" FontSize="24" FontAttributes="Bold" TextColor="White" VerticalOptions="Center"/>
+            <ImageButton Grid.Column="1" 
+                         Source="logout.png" 
+                         Command="{Binding LogoutCommand}"
+                         WidthRequest="28" HeightRequest="28" 
+                         BackgroundColor="Transparent"
+                         VerticalOptions="Center"/>
+        </Grid>
+
+        <!-- Search Bar -->
+        <SearchBar Grid.Row="1" Placeholder="Search songs, artists, genres..." Text="{Binding SearchText}"
                    SearchCommand="{Binding LoadSongsCommand}" BackgroundColor="#2a2a2a" PlaceholderColor="Gray" TextColor="White" Margin="10"/>
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Songs}" SelectionMode="None">
-            <!-- In HomePage.xaml -->
+        <!-- Song List -->
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Songs}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Song">
                     <Grid Padding="10" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" RowSpacing="5">
                         <Grid.GestureRecognizers>
-                            <!-- Keep the main tap gesture for playing the song -->
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=PlaySongCommand}" CommandParameter="{Binding .}"/>
                         </Grid.GestureRecognizers>
 
@@ -33,19 +48,12 @@
                             </Label>
                         </VerticalStackLayout>
 
-                        <!-- Like Button -->
                         <ImageButton Grid.Column="2" Source="{Binding IsLiked, Converter={StaticResource BoolToHeartIconConverter}}" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
-                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=ToggleLikeCommand}" CommandParameter="{Binding .}"/>
-
-                        <!-- Add to Playlist Button -->
+                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=ToggleLikeCommand}" CommandParameter="{Binding .}"/>
                         <ImageButton Grid.Column="3" Source="plus_circle.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent" Margin="5,0"
-                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=AddToPlaylistCommand}" CommandParameter="{Binding .}"/>
-
-                        <!-- Comments Button -->
+                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=AddToPlaylistCommand}" CommandParameter="{Binding .}"/>
                         <ImageButton Grid.Column="4" Source="comments.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
-                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
-
-                        <!-- Play Indicator (no command, just visual) -->
+                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
                         <ImageButton Grid.Column="5" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
                     </Grid>
                 </DataTemplate>
@@ -56,6 +64,7 @@
                 </StackLayout>
             </CollectionView.EmptyView>
         </CollectionView>
-        <ActivityIndicator Grid.Row="1" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#1DB954" VerticalOptions="Center" HorizontalOptions="Center"/>
+
+        <ActivityIndicator Grid.Row="2" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#1DB954" VerticalOptions="Center" HorizontalOptions="Center"/>
     </Grid>
 </ContentPage>
