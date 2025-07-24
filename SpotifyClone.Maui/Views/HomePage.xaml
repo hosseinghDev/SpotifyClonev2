@@ -28,9 +28,12 @@
 
         <!-- Song List -->
         <CollectionView Grid.Row="2" ItemsSource="{Binding Songs}" SelectionMode="None">
+            <!-- In HomePage.xaml -->
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Song">
                     <Grid Padding="10" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" RowSpacing="5">
+
+                        <!-- Main tap gesture on the Grid (for tapping text/image) -->
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=PlaySongCommand}" CommandParameter="{Binding .}"/>
                         </Grid.GestureRecognizers>
@@ -49,12 +52,16 @@
                         </VerticalStackLayout>
 
                         <ImageButton Grid.Column="2" Source="{Binding IsLiked, Converter={StaticResource BoolToHeartIconConverter}}" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
-                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=ToggleLikeCommand}" CommandParameter="{Binding .}"/>
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=ToggleLikeCommand}" CommandParameter="{Binding .}"/>
                         <ImageButton Grid.Column="3" Source="plus_circle.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent" Margin="5,0"
-                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=AddToPlaylistCommand}" CommandParameter="{Binding .}"/>
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=AddToPlaylistCommand}" CommandParameter="{Binding .}"/>
                         <ImageButton Grid.Column="4" Source="comments.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
-                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
-                        <ImageButton Grid.Column="5" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"/>
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
+
+                        <!-- THIS IS THE FIX: Added Command and CommandParameter -->
+                        <ImageButton Grid.Column="5" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"
+                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=PlaySongCommand}"
+                         CommandParameter="{Binding .}"/>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
