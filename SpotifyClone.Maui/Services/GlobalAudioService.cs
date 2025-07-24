@@ -25,13 +25,18 @@ namespace SpotifyClone.Maui.Services
         private bool isPlaying;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(PlaybackProgress))] // Notify progress changes
         private double currentPosition;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(PlaybackProgress))] // Notify progress changes
         private double duration;
 
         public bool IsVisible => CurrentSong != null;
         public string PlayPauseButtonIcon => IsPlaying ? "pause_circle.png" : "play_circle.png";
+
+        // NEW: Calculated property for the progress bar
+        public double PlaybackProgress => (Duration > 0) ? CurrentPosition / Duration : 0;
 
         public GlobalAudioService(IAudioManager audioManager)
         {
@@ -54,7 +59,6 @@ namespace SpotifyClone.Maui.Services
         {
             if (CurrentSong?.Id == song.Id)
             {
-                // If the same song is tapped, just navigate to the player page
                 await GoToPlayerPage();
                 return;
             }
@@ -75,29 +79,19 @@ namespace SpotifyClone.Maui.Services
                 _currentPlayer.Play();
                 Duration = _currentPlayer.Duration;
                 _timer?.Start();
-
                 await GoToPlayerPage();
             }
-            catch (Exception)
-            {
-                Stop();
-            }
+            catch (Exception) { Stop(); }
         }
 
         [RelayCommand]
         public void TogglePlayPause()
         {
             if (_currentPlayer == null) return;
-
-            if (_currentPlayer.IsPlaying)
-                _currentPlayer.Pause();
-            else
-                _currentPlayer.Play();
-
+            if (_currentPlayer.IsPlaying) _currentPlayer.Pause(); else _currentPlayer.Play();
             IsPlaying = _currentPlayer.IsPlaying;
         }
 
-        // NEW METHOD
         public void Seek(double position)
         {
             _currentPlayer?.Seek(position);

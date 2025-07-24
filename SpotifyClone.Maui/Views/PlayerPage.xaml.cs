@@ -16,7 +16,15 @@ public partial class PlayerPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        // Clean up the event handler to prevent memory leaks
         _viewModel.Cleanup();
+    }
+
+    // This event handler calls the ViewModel command with the slider's value
+    private void PositionSlider_DragCompleted(object sender, EventArgs e)
+    {
+        if (sender is Slider slider)
+        {
+            _viewModel.SeekCommand.Execute(slider.Value);
+        }
     }
 }

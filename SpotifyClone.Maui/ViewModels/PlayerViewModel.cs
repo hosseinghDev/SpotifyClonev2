@@ -12,11 +12,7 @@ namespace SpotifyClone.Maui.ViewModels
 
         public Song? CurrentSong => _globalAudioService.CurrentSong;
         public double Duration => _globalAudioService.Duration;
-
-        // This property is now used for both displaying and setting the position
-        [ObservableProperty]
-        private double currentPosition;
-
+        public double CurrentPosition => _globalAudioService.CurrentPosition;
         public bool IsPlaying => _globalAudioService.IsPlaying;
         public string PlayPauseButtonIcon => _globalAudioService.PlayPauseButtonIcon;
 
@@ -31,12 +27,6 @@ namespace SpotifyClone.Maui.ViewModels
 
         private void GlobalAudioService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            // Only update our copy of CurrentPosition if the service changes it
-            if (e.PropertyName == nameof(_globalAudioService.CurrentPosition))
-            {
-                CurrentPosition = _globalAudioService.CurrentPosition;
-            }
-
             OnPropertyChanged(e.PropertyName);
             if (e.PropertyName is nameof(CurrentPosition)) OnPropertyChanged(nameof(PositionText));
             if (e.PropertyName is nameof(Duration)) OnPropertyChanged(nameof(DurationText));
@@ -48,13 +38,11 @@ namespace SpotifyClone.Maui.ViewModels
             _globalAudioService.TogglePlayPause();
         }
 
-        // CORRECTED SEEK COMMAND
+        // Final Seek Command - accepts a double
         [RelayCommand]
-        private void Seek()
+        private void Seek(double position)
         {
-            // The Slider's Value is two-way bound to our CurrentPosition property.
-            // When DragCompleted is fired, the value is already updated here.
-            _globalAudioService.Seek(this.CurrentPosition);
+            _globalAudioService.Seek(position);
         }
 
         public void Cleanup()
