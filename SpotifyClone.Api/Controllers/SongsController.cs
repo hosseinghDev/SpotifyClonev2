@@ -20,13 +20,13 @@ namespace SpotifyClone.Api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly ILogger<SongsController> _logger; // <-- ADD LOGGER
+        private readonly ILogger<SongsController> _logger; 
 
         public SongsController(ApplicationDbContext context, IWebHostEnvironment hostingEnvironment, ILogger<SongsController> logger) // <-- INJECT LOGGER
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
-            _logger = logger; // <-- INITIALIZE LOGGER
+            _logger = logger; 
         }
 
         private string GetBaseUrl()
@@ -36,7 +36,7 @@ namespace SpotifyClone.Api.Controllers
             return $"{request.Scheme}://{request.Host}";
         }
 
-        // In SongsController.cs
+        
         [HttpGet]
         [Authorize] // <-- Add Authorize attribute to get the user ID
         public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs([FromQuery] string? search)
@@ -84,7 +84,7 @@ namespace SpotifyClone.Api.Controllers
                 return NotFound("Song metadata not found.");
             }
 
-            // --- New, More Robust Path Logic ---
+            
             // Get the base wwwroot path
             var wwwRootPath = _hostingEnvironment.WebRootPath;
 

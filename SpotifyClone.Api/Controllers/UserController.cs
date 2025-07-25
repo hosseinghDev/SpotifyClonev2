@@ -58,9 +58,7 @@ namespace SpotifyClone.Api.Controllers
             return BadRequest("Could not process like/unlike request.");
         }
 
-        // In Controllers/UserController.cs, add this new method inside the class.
 
-        // In Controllers/UserController.cs
 
         [HttpGet("songs/liked")]
         public async Task<ActionResult<IEnumerable<SongDto>>> GetLikedSongs()
@@ -70,14 +68,14 @@ namespace SpotifyClone.Api.Controllers
             var request = HttpContext.Request;
             var baseUrl = $"{request.Scheme}://{request.Host}";
 
-            // THIS IS THE CORRECTED QUERY
+            
             var likedSongs = await _context.UserLikedSongs
                 .Where(uls => uls.UserId == userId)
                 .Select(uls => new SongDto // Project directly to the DTO here
                 {
                     Id = uls.Song.Id,
                     Title = uls.Song.Title,
-                    SingerName = uls.Song.Singer.Name, // This will now work correctly
+                    SingerName = uls.Song.Singer.Name, 
                     SingerId = uls.Song.SingerId,
                     Genre = uls.Song.Genre,
                     FileUrl = $"{baseUrl}/api/songs/stream/{uls.Song.Id}",

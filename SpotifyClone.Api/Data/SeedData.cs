@@ -49,7 +49,7 @@ namespace SpotifyClone.Api.Data
                 await context.SaveChangesAsync();
 
                 // Songs
-                // IMPORTANT: Create these folders and files manually for the seed to work
+                // Created folders and files manually for the seed to work
                 // API_PROJECT_ROOT/wwwroot/uploads/songs/
                 // API_PROJECT_ROOT/wwwroot/uploads/images/
                 var song1 = new Song { Title = "Sunset", SingerId = singer1.Id, Genre = "Synthwave", FilePath = "uploads/songs/the_midnight_sunset.mp3", ImageUrl = "uploads/images/the_midnight_cover.jpg", UploadedAt = DateTime.UtcNow };
