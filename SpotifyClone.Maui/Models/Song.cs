@@ -1,8 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel; // <-- ADD THIS
+﻿using CommunityToolkit.Mvvm.ComponentModel; 
 
 namespace SpotifyClone.Maui.Models
 {
-    public partial class Song : ObservableObject // <-- CHANGE THIS
+    public partial class Song : ObservableObject 
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -12,7 +12,7 @@ namespace SpotifyClone.Maui.Models
         public string FileUrl { get; set; }
         public string ImageUrl { get; set; }
 
-        [ObservableProperty] // <-- ADD THIS
+        [ObservableProperty] 
         private bool isLiked;
     }
 }

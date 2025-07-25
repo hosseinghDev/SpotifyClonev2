@@ -45,7 +45,7 @@
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Liked Songs" FontSize="18" FontAttributes="Bold" TextColor="White"/>
 
-                        <!-- THIS IS THE CRITICAL FIX: Replaced CollectionView with a BindableLayout -->
+                        <!--  Replaced CollectionView with a BindableLayout -->
                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding LikedSongs}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="model:Song">

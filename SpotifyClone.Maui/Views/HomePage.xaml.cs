@@ -21,7 +21,7 @@ public partial class HomePage : ContentPage
         _viewModel.LoadSongsCommand.Execute(null);
     }
 }
-// Inside the HomePage.xaml.cs file, but outside the HomePage class
+
 public class BoolToHeartIconConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

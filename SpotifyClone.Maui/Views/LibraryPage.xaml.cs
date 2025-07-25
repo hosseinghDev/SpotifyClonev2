@@ -22,7 +22,7 @@ public partial class LibraryPage : ContentPage
     }
 }
 
-// Inside the LibraryPage.xaml.cs file, but outside the LibraryPage class
+
 public class IntToBoolConverter : IValueConverter
 {
     // This will return true (visible) if the count is 0, and false (hidden) otherwise.

@@ -10,7 +10,6 @@ public partial class AppShell : Shell
         InitializeComponent();
 
         // Set the binding context to the singleton service instance
-        // This will now work correctly for the mini-player Frame.
         BindingContext = globalAudioService;
 
         Routing.RegisterRoute(nameof(PlayerPage), typeof(PlayerPage));

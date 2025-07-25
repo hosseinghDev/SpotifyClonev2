@@ -33,7 +33,7 @@ namespace SpotifyClone.Maui.ViewModels
             // This is a "catch-all" to forward any property change from the service to the UI
             OnPropertyChanged(e.PropertyName);
 
-            // We also need to manually notify changes for properties that depend on others
+            // manually notify changes for properties that depend on others
             if (e.PropertyName is nameof(CurrentPosition)) OnPropertyChanged(nameof(PositionText));
             if (e.PropertyName is nameof(Duration)) OnPropertyChanged(nameof(DurationText));
             if (e.PropertyName is nameof(GlobalAudioService.IsShuffled)) OnPropertyChanged(nameof(ShuffleIcon));

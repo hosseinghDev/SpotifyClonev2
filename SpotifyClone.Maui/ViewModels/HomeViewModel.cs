@@ -63,7 +63,7 @@ namespace SpotifyClone.Maui.ViewModels
             await _globalAudioService.StartPlayback(song, Songs.ToList());
         }
 
-        // --- NEW COMMANDS ---
+        
         [RelayCommand]
         async Task ToggleLike(Song song)
         {
@@ -112,14 +112,14 @@ namespace SpotifyClone.Maui.ViewModels
                 }
             }
         }
-        // --- END OF NEW COMMANDS ---
+        
 
         [RelayCommand]
         async Task GoToSingerProfile(int singerId) => await Shell.Current.GoToAsync($"{nameof(SingerProfilePage)}?singerId={singerId}");
 
         [RelayCommand]
         async Task GoToComments(int songId) => await Shell.Current.GoToAsync($"{nameof(CommentsPage)}?songId={songId}");
-        // In HomeViewModel.cs, add this new command at the end of the file.
+        
 
         [RelayCommand]
         async Task Logout()

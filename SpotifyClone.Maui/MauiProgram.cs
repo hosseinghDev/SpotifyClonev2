@@ -31,10 +31,10 @@ public static class MauiProgram
         //builder.Services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
         builder.Services.AddSingleton<ApiService>();
         builder.Services.AddSingleton(AudioManager.Current);
-        builder.Services.AddSingleton<GlobalAudioService>(); // <-- REGISTER NEW SERVICE
+        builder.Services.AddSingleton<GlobalAudioService>(); 
 
         // Tell the DI container about the AppShell
-        builder.Services.AddSingleton<AppShell>(); // <-- ADD THIS
+        builder.Services.AddSingleton<AppShell>(); 
 
         // ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -49,7 +49,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PlayerViewModel>();
         builder.Services.AddTransient<LibraryViewModel>();
 
-        // REMOVED PlayerViewModel registration
+        
 
         // Views (Pages)
         builder.Services.AddTransient<LoginPage>();
@@ -64,7 +64,7 @@ public static class MauiProgram
         builder.Services.AddTransient<SingerCommentsPage>();
         builder.Services.AddTransient<PlayerPage>();
 
-        // REMOVED PlayerPage registration
+        
 
         return builder.Build();
     }

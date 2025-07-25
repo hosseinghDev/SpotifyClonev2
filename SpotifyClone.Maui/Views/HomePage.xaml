@@ -58,7 +58,7 @@
                         <ImageButton Grid.Column="4" Source="comments.png" WidthRequest="25" HeightRequest="25" BackgroundColor="Transparent"
                          Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=GoToCommentsCommand}" CommandParameter="{Binding Id}"/>
 
-                        <!-- THIS IS THE FIX: Added Command and CommandParameter -->
+                        <!--  Command and CommandParameter -->
                         <ImageButton Grid.Column="5" Source="play_circle.png" WidthRequest="30" HeightRequest="30" BackgroundColor="Transparent"
                          Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:HomeViewModel}}, Path=PlaySongCommand}"
                          CommandParameter="{Binding .}"/>

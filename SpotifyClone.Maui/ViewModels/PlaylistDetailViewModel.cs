@@ -10,16 +10,16 @@ namespace SpotifyClone.Maui.ViewModels
     public partial class PlaylistDetailViewModel : BaseViewModel
     {
         private readonly ApiService _apiService;
-        private readonly GlobalAudioService _globalAudioService; // <-- CHANGE to GlobalAudioService
+        private readonly GlobalAudioService _globalAudioService; 
 
         [ObservableProperty] int playlistId;
         [ObservableProperty] Playlist? playlist;
         [ObservableProperty] ObservableCollection<Song> songs;
 
-        public PlaylistDetailViewModel(ApiService apiService, GlobalAudioService globalAudioService) // <-- INJECT GlobalAudioService
+        public PlaylistDetailViewModel(ApiService apiService, GlobalAudioService globalAudioService) 
         {
             _apiService = apiService;
-            _globalAudioService = globalAudioService; // <-- INITIALIZE
+            _globalAudioService = globalAudioService; 
             Songs = new ObservableCollection<Song>();
         }
 
@@ -63,8 +63,7 @@ namespace SpotifyClone.Maui.ViewModels
             }
         }
 
-        // THIS COMMAND IS NOW DIFFERENT
-        // In PlaylistDetailViewModel.cs
+
         [RelayCommand]
         async Task PlaySong(Song song)
         {
